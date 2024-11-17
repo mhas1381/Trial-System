@@ -1,7 +1,6 @@
 {% load static %}
 
 <!DOCTYPE html>
-<!-- Created By CodingNepal -->
 <html lang="en" dir="ltr">
    <head>
       <meta charset="utf-8">
@@ -13,13 +12,14 @@
          <div class="title">
             Login Form
          </div>
-         <form action="#">
+         <form action="{% url 'accounts:login' %}" method="post">
+            {% csrf_token %}
             <div class="field">
-               <input type="text" required>
+               <input type="text" name="phone_number" required>
                <label>Phone Number</label>
             </div>
             <div class="field">
-               <input type="password" required>
+               <input type="password" name="password" required>
                <label>Password</label>
             </div>
             <div class="content">

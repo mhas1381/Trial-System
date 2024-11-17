@@ -1,6 +1,5 @@
 {% load static %}
 <!DOCTYPE html>
-<!-- Created By CodingNepal -->
 <html lang="en" dir="ltr">
    <head>
       <meta charset="utf-8">
@@ -12,37 +11,30 @@
          <div class="title">
             Sign Up
          </div>
-         <form action="#">
+         <!-- ارسال داده‌ها به ویوی ثبت‌نام -->
+         <form action="{% url 'accounts:signup' %}" method="post">
+            {% csrf_token %}
             <div class="field">
-               <input type="text" required>
+               <input type="text" name="phone_number" required>
                <label>Phone Number</label>
             </div>
             <div class="field">
-                <input type="text" required>
+                <input type="text" name="first_name" required>
                 <label>First Name</label>
-             </div>
-             <div class="field">
-                <input type="text" required>
-                <label>Last Name</label>
-             </div>
+            </div>
             <div class="field">
-               <input type="password" required>
+                <input type="text" name="last_name" required>
+                <label>Last Name</label>
+            </div>
+            <div class="field">
+               <input type="password" name="password" required>
                <label>Password</label>
             </div>
-            <!-- <div class="content">
-               <div class="checkbox">
-                  <input type="checkbox" id="remember-me">
-                  <label for="remember-me">Remember me</label>
-               </div>
-               <div class="pass-link">
-                  <a href="#">Forgot password?</a>
-               </div>
-            </div> -->
             <div class="field">
                <input type="submit" value="Sign Up">
             </div>
             <div class="signup-link">
-               Are you a member> <a href="{% url 'accounts:login' %}">Login now</a>
+               Already a member? <a href="{% url 'accounts:login' %}">Login now</a>
             </div>
          </form>
       </div>
