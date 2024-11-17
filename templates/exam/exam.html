@@ -5,8 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Page</title>
-    <link rel="stylesheet" href="{% static 'css/exam.css' %}
-    "> <!-- لینک به فایل CSS -->
+    <link rel="stylesheet" href="{% static 'css/exam.css' %}">
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        document.addEventListener("visibilitychange", function() {
+            const action = document.hidden ? 'tab-hidden' : 'tab-visible';
+            fetch('/track-tab-change/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ action: action })
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="wrapper">
@@ -27,9 +54,10 @@
                 <textarea id="question3" name="question3" rows="5" placeholder="Write your answer here..."></textarea>
             </div>
             <div class="field">
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit Answers">
             </div>
         </form>
     </div>
+    <p>Please change the browser tab and check if the tab change is recorded.</p>
 </body>
 </html>
