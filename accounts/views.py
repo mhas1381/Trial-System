@@ -19,7 +19,7 @@ def login_view(request):
             if user.is_active:
                 login(request, user)
                 messages.success(request, 'Login successful!')
-                return redirect('home')  # به صفحه اصلی یا داشبورد هدایت شود
+                return redirect('exam:exam',)  # به صفحه اصلی یا داشبورد هدایت شود
             else:
                 messages.error(request, 'Your account is inactive. Please contact support.')
         else:

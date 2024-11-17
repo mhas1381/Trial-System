@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <link rel="stylesheet" href="{% static 'css/exam.css' %}
+    "> <!-- لینک به فایل CSS -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">
+            Test Page
+        </div>
+        <form action="#" method="POST">
+            <div class="question">
+                <label for="question1">1. What is your understanding of Object-Oriented Programming?</label>
+                <textarea id="question1" name="question1" rows="5" placeholder="Write your answer here..."></textarea>
+            </div>
+            <div class="question">
+                <label for="question2">2. Explain the difference between REST and SOAP APIs.</label>
+                <textarea id="question2" name="question2" rows="5" placeholder="Write your answer here..."></textarea>
+            </div>
+            <div class="question">
+                <label for="question3">3. Describe the process of debugging in Python.</label>
+                <textarea id="question3" name="question3" rows="5" placeholder="Write your answer here..."></textarea>
+            </div>
+            <div class="field">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+</body>
+</html>
