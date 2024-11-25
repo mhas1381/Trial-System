@@ -22,8 +22,7 @@
             return cookieValue;
         }
 
-        document.addEventListener("visibilitychange", function() {
-            const action = document.hidden ? 'tab-hidden' : 'tab-visible';
+        function trackAction(action) {
             fetch('/track-tab-change/', {
                 method: 'POST',
                 headers: {
@@ -32,6 +31,25 @@
                 },
                 body: JSON.stringify({ action: action })
             });
+        }
+
+        // تشخیص تغییر تب
+        document.addEventListener("visibilitychange", function() {
+            const action = document.hidden ? 'tab-hidden' : 'tab-visible';
+            trackAction(action);
+        });
+
+        // تشخیص خروج موس از صفحه
+        document.addEventListener("mouseleave", function(event) {
+            if (event.clientY <= 0 || event.clientX <= 0 || 
+                event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
+                trackAction('mouse-left');
+            }
+        });
+
+        // تشخیص برگشت موس به صفحه
+        document.addEventListener("mouseenter", function() {
+            trackAction('mouse-entered');
         });
     </script>
 </head>
@@ -58,6 +76,6 @@
             </div>
         </form>
     </div>
-    <p>Please change the browser tab and check if the tab change is recorded.</p>
+    <p>Please change the browser tab or move mouse outside the window to test tracking.</p>
 </body>
 </html>

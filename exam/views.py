@@ -28,15 +28,18 @@ def track_tab_change(request):
         if not user.is_authenticated:
             return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=403)
 
-        if action in ['tab-hidden', 'tab-visible']:
+        if action in ['tab-hidden', 'tab-visible', 'mouse-left', 'mouse-entered']:
             tab_change, created = TabChange.objects.get_or_create(user=user)
             tab_change.add_tab_change(action, user_agent, ip_address)
 
-            # چاپ پیام دقیق تر
-            if action == 'tab-hidden':
-                print(f"User eft the tab")
-            elif action == 'tab-visible':
-                print(f"User returned to the tab")
+            # چاپ پیام های مختلف بر اساس نوع action
+            action_messages = {
+                'tab-hidden': "User left the tab",
+                'tab-visible': "User returned to the tab",
+                'mouse-left': "Mouse left the window",
+                'mouse-entered': "Mouse entered the window"
+            }
+            print(action_messages.get(action, "Unknown action"))
 
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
