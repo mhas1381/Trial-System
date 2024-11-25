@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from datetime import timedelta
 from accounts.models import User
 
 class TabChange(models.Model):
@@ -27,3 +28,20 @@ class TabChange(models.Model):
         if action:
             return sum(1 for change in self.tab_changes['changes'] if change['action'] == action)
         return len(self.tab_changes['changes'])
+
+    def calculate_total_time_away(self):
+        
+        total_time_away = timedelta(0)
+        last_exit_time = None
+
+        # Loop through the changes to calculate time away
+        for change in self.tab_changes.get('changes', []):
+            if change['action'] == 'tab-hidden':
+                last_exit_time = now().fromisoformat(change['timestamp'])
+            elif change['action'] == 'tab-visible' and last_exit_time:
+                entry_time = now().fromisoformat(change['timestamp'])
+                time_away = entry_time - last_exit_time
+                total_time_away += time_away
+                last_exit_time = None  # Reset after adding the time away
+
+        return total_time_away
