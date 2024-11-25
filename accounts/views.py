@@ -12,7 +12,7 @@ def login_view(request):
         phone_number = request.POST.get('phone_number')
         password = request.POST.get('password')
 
-        # اعتبارسنجی کاربر
+        
         user = authenticate(request, phone_number=phone_number, password=password)
 
         if user is not None:
@@ -40,12 +40,20 @@ def signup_view(request):
 
         try:
             with transaction.atomic():
-                user = User.objects.create_user(phone_number=phone_number, password=password)
-                user.is_verified = True  # در صورت نیاز
-                user.save()
+                
+                user, created = User.objects.get_or_create(phone_number=phone_number)
+                if created:
+                    user.set_password(password)
+                    user.is_verified = True  
+                    user.save()
+                else:
+                    messages.info(request, 'User already exists. Updating profile.')
 
-                # ایجاد پروفایل
-                Profile.objects.create(user=user, first_name=first_name, last_name=last_name)
+                
+                profile, profile_created = Profile.objects.update_or_create(
+                    user=user,
+                    defaults={'first_name': first_name, 'last_name': last_name}
+                )
 
             messages.success(request, 'Sign-up successful! You can now log in.')
             return redirect('accounts:login')

@@ -3,7 +3,7 @@
 <html lang="en" dir="ltr">
    <head>
       <meta charset="utf-8">
-      <title>Sign Up | CodeLab</title>
+      <title>Sign Up</title>
       <link rel="stylesheet" href="{% static 'css/style.css' %}">
    </head>
    <body>
@@ -11,7 +11,7 @@
          <div class="title">
             Sign Up
          </div>
-         <!-- ارسال داده‌ها به ویوی ثبت‌نام -->
+         
          <form action="{% url 'accounts:signup' %}" method="post">
             {% csrf_token %}
             <div class="field">
