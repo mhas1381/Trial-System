@@ -32,14 +32,21 @@ def track_tab_change(request):
             tab_change, created = TabChange.objects.get_or_create(user=user)
             tab_change.add_tab_change(action, user_agent, ip_address)
 
-            # چاپ پیام های مختلف بر اساس نوع action
-            action_messages = {
-                'tab-hidden': "User left the tab",
-                'tab-visible': "User returned to the tab",
-                'mouse-left': "Mouse left the window",
-                'mouse-entered': "Mouse entered the window"
-            }
-            print(action_messages.get(action, "Unknown action"))
+            # Print the event in the terminal
+            if action == 'tab-hidden':
+                print(f"User hide the tab.")
+            elif action == 'tab-visible':
+                print(f"User returned to the tab.")
+            elif action == 'mouse-left':
+                print(f"User moved the mouse out of the window.")
+            elif action == 'mouse-entered':
+                print(f"User moved the mouse back into the window.")
+
+            # Check the number of tab changes
+            tab_change_count = tab_change.count_tab_changes()
+            if tab_change_count >= 40:
+                # Send a warning message
+                return JsonResponse({'status': 'warning', 'message': 'شما ۲۰ بار از صفحه آزمون خارج شده اید.'})
 
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)

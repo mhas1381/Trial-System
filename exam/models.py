@@ -19,3 +19,11 @@ class TabChange(models.Model):
             self.tab_changes['changes'] = []
         self.tab_changes['changes'].append(change)
         self.save()
+
+    def count_tab_changes(self, action=None):
+        """Count the number of specific tab change actions."""
+        if 'changes' not in self.tab_changes:
+            return 0
+        if action:
+            return sum(1 for change in self.tab_changes['changes'] if change['action'] == action)
+        return len(self.tab_changes['changes'])

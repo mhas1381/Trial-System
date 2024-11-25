@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,25 +35,45 @@
         }
 
         // تشخیص تغییر تب
-        document.addEventListener("visibilitychange", function() {
+        document.addEventListener("visibilitychange", function () {
             const action = document.hidden ? 'tab-hidden' : 'tab-visible';
             trackAction(action);
         });
 
         // تشخیص خروج موس از صفحه
-        document.addEventListener("mouseleave", function(event) {
-            if (event.clientY <= 0 || event.clientX <= 0 || 
+        document.addEventListener("mouseleave", function (event) {
+            if (event.clientY <= 0 || event.clientX <= 0 ||
                 event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
                 trackAction('mouse-left');
             }
         });
 
         // تشخیص برگشت موس به صفحه
-        document.addEventListener("mouseenter", function() {
+        document.addEventListener("mouseenter", function () {
             trackAction('mouse-entered');
         });
+
+        function trackAction(action) {
+            fetch('/track-tab-change/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ action: action })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'warning') {
+                        alert(data.message);
+                    }
+                });
+        }
+
     </script>
+
 </head>
+
 <body>
     <div class="wrapper">
         <div class="title">
@@ -78,4 +99,5 @@
     </div>
     <p>Please change the browser tab or move mouse outside the window to test tracking.</p>
 </body>
+
 </html>
