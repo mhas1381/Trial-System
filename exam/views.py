@@ -45,15 +45,14 @@ def track_tab_change(request):
 
             # Check the number of tab changes
             tab_change_count = tab_change.count_tab_changes()
-            if tab_change_count >= 40:
+            if tab_change_count == 40:
                 # Send a warning message
                 return JsonResponse({'status': 'warning', 'message': 'شما ۲۰ بار از صفحه آزمون خارج شده اید.'})
             
             total_time_away = tab_change.calculate_total_time_away()
-
+            print(total_time_away)
             
-            if total_time_away > timedelta(minutes=1):
+            if total_time_away > timedelta(seconds=5):
                 return JsonResponse({'status': 'warning', 'message': 'شما برای مدت زیادی از صفحه آزمون خارج شده اید!'})
-
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)

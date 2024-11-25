@@ -30,15 +30,15 @@ class TabChange(models.Model):
         return len(self.tab_changes['changes'])
 
     def calculate_total_time_away(self):
-        
+        """محاسبه مجموع زمان‌هایی که کاربر از صفحه بیرون بوده"""
         total_time_away = timedelta(0)
         last_exit_time = None
 
         # Loop through the changes to calculate time away
         for change in self.tab_changes.get('changes', []):
-            if change['action'] == 'tab-hidden':
+            if change['action'] in ['tab-hidden', 'mouse-left']:  # added mouse-left
                 last_exit_time = now().fromisoformat(change['timestamp'])
-            elif change['action'] == 'tab-visible' and last_exit_time:
+            elif change['action'] in ['tab-visible', 'mouse-entered'] and last_exit_time:  # added mouse-entered
                 entry_time = now().fromisoformat(change['timestamp'])
                 time_away = entry_time - last_exit_time
                 total_time_away += time_away
