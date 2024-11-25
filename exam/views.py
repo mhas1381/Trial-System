@@ -5,9 +5,16 @@ from django.utils.timezone import now
 import json
 from .models import TabChange
 # Create your views here.
+
+
 def exam_view(request):
 
-    return render(request , "exam/exam.html")
+    return render(request, "exam/exam.html")
+
+
+def home_view(request):
+    return render(request, 'home.html')
+
 
 @csrf_exempt
 def track_tab_change(request):
@@ -24,6 +31,12 @@ def track_tab_change(request):
         if action in ['tab-hidden', 'tab-visible']:
             tab_change, created = TabChange.objects.get_or_create(user=user)
             tab_change.add_tab_change(action, user_agent, ip_address)
+
+            # چاپ پیام دقیق تر
+            if action == 'tab-hidden':
+                print(f"User eft the tab")
+            elif action == 'tab-visible':
+                print(f"User returned to the tab")
 
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
