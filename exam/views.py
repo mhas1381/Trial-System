@@ -52,7 +52,7 @@ def track_tab_change(request):
             total_time_away = tab_change.calculate_total_time_away()
             print(total_time_away)
             
-            if total_time_away > timedelta(seconds=500):
+            if total_time_away == timedelta(seconds=500):
                 return JsonResponse({'status': 'warning', 'message': 'شما برای مدت زیادی از صفحه آزمون خارج شده اید!'})
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)

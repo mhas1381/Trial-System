@@ -8,24 +8,23 @@
     <title>Test Page</title>
     <link rel="stylesheet" href="{% static 'css/exam.css' %}">
     <style>
-        
         body {
-            border: 5px solid rgba(255, 99, 71, 0.7); /* قرمز کم‌رنگ‌تر */
+            border: 5px solid rgb(248, 44, 8);
             margin: 0;
         }
-    
-       
+
+
         .warning-message {
-            position: static; 
-            background-color: rgba(255, 99, 71, 0.7); 
+            position: static;
+            background-color: rgb(248, 44, 8);
             color: white;
             font-size: 1.2rem;
             text-align: center;
             padding: 5px;
-            margin-bottom: 20px; 
+            margin-bottom: 20px;
         }
     </style>
-    
+
     <script>
         function getCookie(name) {
             var cookieValue = null;
@@ -59,13 +58,13 @@
                 });
         }
 
-        
+
         document.addEventListener("visibilitychange", function () {
             const action = document.hidden ? 'tab-hidden' : 'tab-visible';
             trackAction(action);
         });
 
-        
+
         document.addEventListener("mouseleave", function (event) {
             if (event.clientY <= 0 || event.clientX <= 0 ||
                 event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
@@ -73,7 +72,7 @@
             }
         });
 
-        
+
         document.addEventListener("mouseenter", function () {
             trackAction('mouse-entered');
         });
@@ -81,7 +80,7 @@
 </head>
 
 <body>
-    
+
     <div class="warning-message">
         !لطفاً موس خود را از صفحه خارج نکنید و تب را تغییر ندهید
     </div>

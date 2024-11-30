@@ -64,7 +64,7 @@ class Profile(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.phone_number
+        return f'{self.first_name} {self.last_name}'
 
 
 @receiver(post_save, sender=User)
