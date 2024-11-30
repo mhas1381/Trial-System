@@ -30,7 +30,7 @@ class TabChange(models.Model):
         return len(self.tab_changes['changes'])
 
     def calculate_total_time_away(self):
-        """محاسبه مجموع زمان‌هایی که کاربر از صفحه بیرون بوده"""
+        
         total_time_away = timedelta(0)
         last_exit_time = None
 

@@ -7,6 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Page</title>
     <link rel="stylesheet" href="{% static 'css/exam.css' %}">
+    <style>
+        
+        body {
+            border: 5px solid rgba(255, 99, 71, 0.7); /* قرمز کم‌رنگ‌تر */
+            margin: 0;
+        }
+    
+       
+        .warning-message {
+            position: static; 
+            background-color: rgba(255, 99, 71, 0.7); 
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 5px;
+            margin-bottom: 20px; 
+        }
+    </style>
+    
     <script>
         function getCookie(name) {
             var cookieValue = null;
@@ -31,36 +50,6 @@
                     'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify({ action: action })
-            });
-        }
-
-        // تشخیص تغییر تب
-        document.addEventListener("visibilitychange", function () {
-            const action = document.hidden ? 'tab-hidden' : 'tab-visible';
-            trackAction(action);
-        });
-
-        // تشخیص خروج موس از صفحه
-        document.addEventListener("mouseleave", function (event) {
-            if (event.clientY <= 0 || event.clientX <= 0 ||
-                event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
-                trackAction('mouse-left');
-            }
-        });
-
-        // تشخیص برگشت موس به صفحه
-        document.addEventListener("mouseenter", function () {
-            trackAction('mouse-entered');
-        });
-
-        function trackAction(action) {
-            fetch('/track-tab-change/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ action: action })
             })
                 .then(response => response.json())
                 .then(data => {
@@ -70,11 +59,33 @@
                 });
         }
 
-    </script>
+        
+        document.addEventListener("visibilitychange", function () {
+            const action = document.hidden ? 'tab-hidden' : 'tab-visible';
+            trackAction(action);
+        });
 
+        
+        document.addEventListener("mouseleave", function (event) {
+            if (event.clientY <= 0 || event.clientX <= 0 ||
+                event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
+                trackAction('mouse-left');
+            }
+        });
+
+        
+        document.addEventListener("mouseenter", function () {
+            trackAction('mouse-entered');
+        });
+    </script>
 </head>
 
 <body>
+    
+    <div class="warning-message">
+        !لطفاً موس خود را از صفحه خارج نکنید و تب را تغییر ندهید
+    </div>
+
     <div class="wrapper">
         <div class="title">
             Test Page
