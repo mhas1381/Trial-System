@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now
 import json
 from datetime import timedelta
-from .models import TabChange
+from .models import *
 # Create your views here.
 
 
