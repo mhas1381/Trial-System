@@ -67,20 +67,20 @@ class Question(models.Model):
 
 
 class Exam(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')  # به طور فرضی از مدل User استفاده می‌کنیم
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')
     score = models.IntegerField(default=0)
     total_questions = models.IntegerField(default=20)
     questions = models.ManyToManyField(Question, related_name='exams')
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
-    
+
     def assign_random_questions(self):
-        # Assign 20 random questions to the exam
-        random_questions = Question.objects.order_by('?')[:self.total_questions]
+        # سوالات را از بانک سوال مرتبط با این آزمون انتخاب کن
+        random_questions = self.question_bank.questions.order_by('?')[:self.total_questions]
         self.questions.set(random_questions)
 
     def calculate_score(self):
-        # Calculate the score based on correct answers
+        # محاسبه امتیاز بر اساس پاسخ‌های درست
         correct_answers = self.answers.filter(is_correct=True).count()
         self.score = correct_answers
         self.save()
