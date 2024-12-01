@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
 from datetime import timedelta
-from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
 import random
@@ -35,15 +34,13 @@ class TabChange(models.Model):
         return len(self.tab_changes['changes'])
 
     def calculate_total_time_away(self):
-
         total_time_away = timedelta(0)
         last_exit_time = None
 
         # Loop through the changes to calculate time away
         for change in self.tab_changes.get('changes', []):
-            if change['action'] in ['tab-hidden', 'mouse-left']:  # added mouse-left
+            if change['action'] in ['tab-hidden', 'mouse-left']:
                 last_exit_time = now().fromisoformat(change['timestamp'])
-            # added mouse-entered
             elif change['action'] in ['tab-visible', 'mouse-entered'] and last_exit_time:
                 entry_time = now().fromisoformat(change['timestamp'])
                 time_away = entry_time - last_exit_time
@@ -60,24 +57,48 @@ class Question(models.Model):
     option_c = models.CharField(max_length=255)
     option_d = models.CharField(max_length=255)
     correct_option = models.CharField(max_length=1, choices=[('A', 'Option A'), ('B', 'Option B'), ('C', 'Option C'), ('D', 'Option D')])
+    exam = models.ForeignKey('Exam', on_delete=models.CASCADE, related_name='questions')  # ارتباط به آزمون
 
     def __str__(self):
         return self.text
-
 
 
 class Exam(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')
     score = models.IntegerField(default=0)
     total_questions = models.IntegerField(default=20)
-    questions = models.ManyToManyField(Question, related_name='exams')
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
+    question_file = models.FileField(upload_to='exam_question_files/', null=True, blank=True)  # فایل اکسل سوالات
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.question_file:
+            self.save_questions_from_excel()
+
+    def save_questions_from_excel(self):
+        # بارگذاری سوالات از فایل اکسل
+        if not self.question_file:
+            return
+
+        # خواندن فایل اکسل با pandas
+        df = pd.read_excel(self.question_file.path)
+
+        # ذخیره سوالات در بانک داده و ارتباط با آزمون
+        for _, row in df.iterrows():
+            Question.objects.create(
+                text=row.get('question'),
+                option_a=row.get('option_a'),
+                option_b=row.get('option_b'),
+                option_c=row.get('option_c'),
+                option_d=row.get('option_d'),
+                correct_option=row.get('correct_option'),
+                exam=self  # اتصال به آزمون
+            )
 
     def assign_random_questions(self):
-        # سوالات را از بانک سوال مرتبط با این آزمون انتخاب کن
-        random_questions = self.question_bank.questions.order_by('?')[:self.total_questions]
-        self.questions.set(random_questions)
+        # انتخاب سوالات تصادفی برای کاربر
+        return self.questions.order_by('?')[:self.total_questions]
 
     def calculate_score(self):
         # محاسبه امتیاز بر اساس پاسخ‌های درست
@@ -89,9 +110,9 @@ class Exam(models.Model):
         return f"Exam for {self.user.phone_number} - {self.score} points"
 
 
-
 class Answer(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='answers')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answers') 
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     selected_option = models.CharField(max_length=1, choices=[('A', 'Option A'), ('B', 'Option B'), ('C', 'Option C'), ('D', 'Option D')])
 
@@ -99,40 +120,4 @@ class Answer(models.Model):
         return self.selected_option == self.question.correct_option
 
     def __str__(self):
-        return f"Answer for {self.question.text}"
-
-
-
-class QuestionBank(models.Model):
-    file = models.FileField(upload_to='question_banks/', storage=FileSystemStorage(location='media/question_banks/'))
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Question Bank uploaded on {self.uploaded_at}"
-
-    def save_questions_from_excel(self):
-        # Load the Excel file and read its contents
-        if not self.file:
-            return
-        
-        # Use pandas to read the Excel file
-        df = pd.read_excel(self.file.path)
-
-        # Iterate through the rows in the file and save questions to the database
-        for index, row in df.iterrows():
-            question_text = row.get('question')
-            option_a = row.get('option_a')
-            option_b = row.get('option_b')
-            option_c = row.get('option_c')
-            option_d = row.get('option_d')
-            correct_option = row.get('correct_option')
-
-            # Create a Question object for each row in the file
-            Question.objects.create(
-                text=question_text,
-                option_a=option_a,
-                option_b=option_b,
-                option_c=option_c,
-                option_d=option_d,
-                correct_option=correct_option
-            )
+        return f"Answer by {self.user.phone_number} for {self.question.text}"
