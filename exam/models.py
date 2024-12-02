@@ -78,8 +78,11 @@ class Exam(models.Model):
             self.save_questions_from_excel()
 
     def save_questions_from_excel(self):
-        # بارگذاری سوالات از فایل اکسل
         if not self.question_file:
+            return
+
+        # اگر آزمون قبلاً سوالات دارد، سوال جدید اضافه نکنید
+        if self.questions.exists():
             return
 
         # خواندن فایل اکسل با pandas
