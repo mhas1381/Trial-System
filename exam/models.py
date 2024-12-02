@@ -64,7 +64,8 @@ class Question(models.Model):
 
 
 class Exam(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')
+    # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')
+    name = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
     total_questions = models.IntegerField(default=20)
     started_at = models.DateTimeField(auto_now_add=True)
@@ -107,7 +108,7 @@ class Exam(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Exam for {self.user.phone_number} - {self.score} points"
+        return self.name
 
 
 class Answer(models.Model):

@@ -23,26 +23,24 @@ class QuestionAdmin(admin.ModelAdmin):
 # تنظیمات نمایش Exam در پنل ادمین
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
-    list_display = ('user', 'score', 'total_questions', 'started_at', 'finished_at')
+    list_display = ('name', 'score', 'total_questions', 'started_at', 'finished_at')
     list_filter = ('started_at', 'finished_at')
-    search_fields = ('user__username', 'user__email')
-    readonly_fields = ('score',)
+    search_fields = ('name',)
+    readonly_fields = ('started_at', 'score')
     fieldsets = (
         (None, {
-            'fields': ('user', 'question_file', 'total_questions')
+            'fields': ('name', 'question_file', 'total_questions')  # افزودن 'name'
         }),
         ('Timestamps', {
             'fields': ('finished_at',)
         }),
     )
-    readonly_fields = ('started_at', 'score')
 
     def save_model(self, request, obj, form, change):
         # Ensure questions are extracted from Excel file when saving an Exam
         super().save_model(request, obj, form, change)
         if not change and obj.question_file:
             obj.save_questions_from_excel()
-
 
 
 @admin.register(Answer)
