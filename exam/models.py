@@ -8,8 +8,9 @@ from accounts.models import User
 
 
 class TabChange(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    tab_changes = models.JSONField(default=dict)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
+    tab_changes = models.JSONField(default=dict) 
+    last_warning_time = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def add_tab_change(self, action, user_agent, ip_address):
