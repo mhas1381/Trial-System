@@ -4,6 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now
 import json
 from datetime import timedelta
+import os
+from django.conf import settings
+import subprocess
 from .models import TabChange
 # Create your views here.
 
@@ -72,3 +75,23 @@ def track_tab_change(request):
             return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error'}, status=400)
+
+def voice_record(request):
+    return render(request , 'exam/voice_record.html')
+
+
+
+@csrf_exempt
+def upload_voice(request):
+    if request.method == 'POST' and request.FILES.get('audio'):
+        audio_file = request.FILES['audio']
+        save_path = os.path.join(settings.MEDIA_ROOT, 'audio', audio_file.name)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+        with open(save_path, 'wb') as f:
+            for chunk in audio_file.chunks():
+                f.write(chunk)
+
+        return JsonResponse({'message': 'Audio uploaded successfully!'})
+
+    return JsonResponse({'message': 'Invalid request'}, status=400)

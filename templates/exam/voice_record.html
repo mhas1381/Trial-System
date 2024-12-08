@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Recorder</title>
+</head>
+<body>
+    <h1>Voice Recorder</h1>
+    <button id="recordButton">Start Recording</button>
+    <button id="stopButton" disabled>Stop Recording</button>
+    <audio id="audioPreview" controls></audio>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let mediaStream;
+    
+        document.getElementById('recordButton').addEventListener('click', async () => {
+            try {
+                // دریافت دسترسی به میکروفون
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(mediaStream);
+    
+                // ذخیره داده‌های صوتی
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+    
+                // مدیریت رویداد پایان ضبط
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    audioChunks = [];
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById('audioPreview').src = audioUrl;
+    
+                    // توقف جریان رسانه‌ها
+                    mediaStream.getTracks().forEach(track => track.stop());
+    
+                    // ارسال فایل به سرور
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'recording.wav');
+    
+                    const response = await fetch('/upload_voice/', {
+                        method: 'POST',
+                        body: formData
+                    });
+    
+                    const result = await response.json();
+                    alert(result.message);
+                };
+    
+                // شروع ضبط
+                mediaRecorder.start();
+                document.getElementById('recordButton').disabled = true;
+                document.getElementById('stopButton').disabled = false;
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                alert("Could not access microphone. Please check your permissions.");
+            }
+        });
+    
+        document.getElementById('stopButton').addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                document.getElementById('recordButton').disabled = false;
+                document.getElementById('stopButton').disabled = true;
+            }
+        });
+    </script>
+    
+</body>
+</html>
