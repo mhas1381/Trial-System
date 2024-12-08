@@ -7,17 +7,23 @@
 </head>
 <body>
     <h1>Voice Recorder</h1>
-    <button id="startButton">Start Automatic Recording</button>
     <audio id="audioPreview" controls></audio>
     <script>
         let recordingInterval;
 
-        document.getElementById('startButton').addEventListener('click', () => {
+        // شروع ضبط به محض لود شدن صفحه
+        document.addEventListener('DOMContentLoaded', () => {
+            startAutoRecording();
+        });
+
+        function startAutoRecording() {
             // شروع ضبط خودکار هر 1 دقیقه یکبار
             recordingInterval = setInterval(() => {
                 recordAudio();
             }, 30000); // هر 1 دقیقه یکبار
-        });
+            // برای شروع اولین ضبط بلافاصله
+            recordAudio();
+        }
 
         async function recordAudio() {
             try {
