@@ -7,66 +7,64 @@
 </head>
 <body>
     <h1>Voice Recorder</h1>
-    <button id="recordButton">Start Recording</button>
-    <button id="stopButton" disabled>Stop Recording</button>
+    <button id="startButton">Start Automatic Recording</button>
     <audio id="audioPreview" controls></audio>
     <script>
-        let mediaRecorder;
-        let audioChunks = [];
-        let mediaStream;
-    
-        document.getElementById('recordButton').addEventListener('click', async () => {
+        let recordingInterval;
+
+        document.getElementById('startButton').addEventListener('click', () => {
+            // شروع ضبط خودکار هر 1 دقیقه یکبار
+            recordingInterval = setInterval(() => {
+                recordAudio();
+            }, 60000); // هر 1 دقیقه یکبار
+            alert("Automatic recording started. Recording 5 seconds every minute.");
+        });
+
+        async function recordAudio() {
             try {
-                // دریافت دسترسی به میکروفون
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(mediaStream);
-    
+                // دسترسی به میکروفون برای ضبط
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(mediaStream);
+                let audioChunks = [];
+
                 // ذخیره داده‌های صوتی
                 mediaRecorder.ondataavailable = event => {
                     audioChunks.push(event.data);
                 };
-    
+
                 // مدیریت رویداد پایان ضبط
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    audioChunks = [];
                     const audioUrl = URL.createObjectURL(audioBlob);
                     document.getElementById('audioPreview').src = audioUrl;
-    
-                    // توقف جریان رسانه‌ها
-                    mediaStream.getTracks().forEach(track => track.stop());
-    
+
                     // ارسال فایل به سرور
                     const formData = new FormData();
                     formData.append('audio', audioBlob, 'recording.wav');
-    
+
                     const response = await fetch('/upload_voice/', {
                         method: 'POST',
                         body: formData
                     });
-    
+
                     const result = await response.json();
                     alert(result.message);
+
+                    // توقف جریان رسانه‌ها
+                    mediaStream.getTracks().forEach(track => track.stop());
                 };
-    
-                // شروع ضبط
+
+                // شروع ضبط 5 ثانیه‌ای
                 mediaRecorder.start();
-                document.getElementById('recordButton').disabled = true;
-                document.getElementById('stopButton').disabled = false;
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                }, 5000); // ضبط برای 5 ثانیه
+
             } catch (err) {
                 console.error("Error accessing microphone:", err);
                 alert("Could not access microphone. Please check your permissions.");
             }
-        });
-    
-        document.getElementById('stopButton').addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                mediaRecorder.stop();
-                document.getElementById('recordButton').disabled = false;
-                document.getElementById('stopButton').disabled = true;
-            }
-        });
+        }
     </script>
-    
 </body>
 </html>
