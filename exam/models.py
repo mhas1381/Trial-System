@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
 from datetime import timedelta
+import os
+from datetime import datetime
 from accounts.models import User
 
 class TabChange(models.Model):
@@ -46,3 +48,19 @@ class TabChange(models.Model):
                 last_exit_time = None  # Reset after adding the time away
 
         return total_time_away
+
+
+def audio_file_path(instance, filename):
+    """Generate file path for new audio file with date-time based name."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # YYYYMMDD_HHMMSS
+    ext = filename.split('.')[-1]  
+    filename = f"{timestamp}.{ext}"  
+    return os.path.join('audio', str(instance.user.phone_number), filename)  
+
+class AudioRecording(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='audio_recordings')
+    file = models.FileField(upload_to=audio_file_path)  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Recording by {self.user.phone_number} at {self.created_at}"

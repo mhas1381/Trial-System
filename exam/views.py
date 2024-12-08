@@ -7,7 +7,7 @@ from datetime import timedelta
 import os
 from django.conf import settings
 import subprocess
-from .models import TabChange
+from .models import TabChange,AudioRecording
 # Create your views here.
 
 
@@ -80,18 +80,18 @@ def voice_record(request):
     return render(request , 'exam/voice_record.html')
 
 
-
 @csrf_exempt
 def upload_voice(request):
     if request.method == 'POST' and request.FILES.get('audio'):
+        if not request.user.is_authenticated:
+            return JsonResponse({'message': 'User not authenticated'}, status=401)
+
         audio_file = request.FILES['audio']
-        save_path = os.path.join(settings.MEDIA_ROOT, 'audio', audio_file.name)
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
-        with open(save_path, 'wb') as f:
-            for chunk in audio_file.chunks():
-                f.write(chunk)
+        # ذخیره فایل در پوشه مخصوص کاربر
+        audio_recording = AudioRecording(user=request.user, file=audio_file)
+        audio_recording.save()
 
-        return JsonResponse({'message': 'Audio uploaded successfully!'})
+        return JsonResponse({'message': 'Audio uploaded successfully!', 'file_path': audio_recording.file.url})
 
     return JsonResponse({'message': 'Invalid request'}, status=400)
